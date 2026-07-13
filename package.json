@@ -1,0 +1,37 @@
+{
+  "name": "bodhi",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Bodhi re-platform monorepo — career assessment platform (web, API, scoring engine, data layer)",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "gm": "tsx packages/golden-master/src/cli.ts",
+    "db:generate": "drizzle-kit generate --config packages/db/drizzle.config.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "drizzle-kit": "^0.30.1",
+    "eslint": "^9.17.0",
+    "nx": "^20.3.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@bodhi/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Drizzle schema v1 for the target Postgres database. Every migrated table carries legacy_id/legacy_source for ETL traceability; primary keys are app-generated UUID v7.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "drizzle-orm": "^0.38.3",
+    "uuidv7": "^1.0.2"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

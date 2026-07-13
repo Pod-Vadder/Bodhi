@@ -1,0 +1,13 @@
+{
+  "name": "@bodhi/scoring-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure, side-effect-free port of the legacy Bodhi scoring logic: sten/aptitude, interest, MBTI personality, CSR career-suitability ranking, wide-condition rules, and a sandboxed expression evaluator replacing NCalc.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run --root ../..",
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

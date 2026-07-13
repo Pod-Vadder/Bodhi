@@ -1,0 +1,54 @@
+{
+  "id": "SYN-002",
+  "description": "Edge paths: younger age band, all-tied MBTI resolving to INFP, unapplied correction, rule priority ordering",
+  "candidate": { "age": 15, "gender": "F" },
+  "referenceData": {
+    "stenTable": [
+      { "scale": "WS1", "ageMin": 13, "ageMax": 15, "rawMin": 0, "rawMax": 10, "sten": 2 },
+      { "scale": "WS1", "ageMin": 13, "ageMax": 15, "rawMin": 11, "rawMax": 30, "sten": 6 }
+    ],
+    "personalitySets": [
+      { "id": "P3", "types": ["INFP", "INFJ"] },
+      { "id": "P4", "types": ["ESTP"] }
+    ],
+    "careers": [
+      {
+        "code": "C101",
+        "name": "Fine Arts",
+        "category": "Arts",
+        "eligibility": ["I002 < 4"],
+        "fit": { "interest": "I002 * 2" },
+        "corrections": [{ "when": "GENDER = 'M'", "delta": 2 }]
+      },
+      {
+        "code": "C102",
+        "name": "Robotics",
+        "category": "Engineering",
+        "eligibility": ["WS1 >= 5"],
+        "fit": { "aptitude": "WS1" }
+      }
+    ],
+    "rules": [
+      { "id": "R1", "when": "TYPE = 'INFP'", "result": { "tag": "REFLECTIVE" }, "priority": 2 },
+      { "id": "R2", "when": "AGE >= 15", "result": { "tag": "SENIOR" }, "priority": 1 }
+    ]
+  },
+  "input": {
+    "aptitude": [{ "scale": "WS1", "raw": 5 }],
+    "interests": [
+      { "scale": "I002", "responses": [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+    ],
+    "mbti": { "E": 5, "I": 5, "S": 5, "N": 5, "T": 5, "F": 5, "J": 5, "P": 5 }
+  },
+  "expected": {
+    "aptitude": [{ "scale": "WS1", "sten": 2, "classification": "L" }],
+    "interests": [{ "scale": "I002", "score": 2, "classification": "L" }],
+    "mbtiType": "INFP",
+    "personalitySet": "P3",
+    "csr": {
+      "Arts": [{ "code": "C101", "rank": 1, "correctedTotal": 4 }]
+    },
+    "ineligibleCareers": ["C102"],
+    "ruleMatches": ["R2", "R1"]
+  }
+}

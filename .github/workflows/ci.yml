@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests + coverage gate
+        run: npm run coverage
+
+      - name: Golden-master synthetic fixtures
+        run: npm run gm -- packages/golden-master/fixtures/synthetic

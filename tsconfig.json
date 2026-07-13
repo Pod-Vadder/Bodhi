@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "packages/**/*.ts",
+    "services/**/*.ts",
+    "apps/**/*.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/dist"
+  ]
+}

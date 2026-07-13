@@ -1,0 +1,11 @@
+{
+  "name": "@bodhi/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bodhi API service. NestJS modules (auth, test-engine, commerce, counseling, reporting, ...) land here in P1+; this package currently reserves the workspace slot and wiring.",
+  "main": "src/main.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

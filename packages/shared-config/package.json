@@ -1,0 +1,15 @@
+{
+  "name": "@bodhi/shared-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Validated environment configuration shared by all services.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

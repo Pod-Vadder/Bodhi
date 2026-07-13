@@ -1,0 +1,11 @@
+{
+  "name": "@bodhi/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bodhi web app (candidate/counselor/admin/partner portals). The Next.js application lands in P2 per the migration roadmap; this package reserves the workspace slot.",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

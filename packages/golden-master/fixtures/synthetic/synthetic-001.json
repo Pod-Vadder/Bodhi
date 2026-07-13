@@ -1,0 +1,78 @@
+{
+  "id": "SYN-001",
+  "description": "Full pipeline happy path: aptitude sten + banding, interest formula, MBTI tie on T/F, CSR filter/corrections/ranking, wide rules",
+  "tolerance": 1e-6,
+  "candidate": { "age": 16, "gender": "M" },
+  "referenceData": {
+    "stenTable": [
+      { "scale": "WS1", "ageMin": 16, "ageMax": 18, "rawMin": 0, "rawMax": 10, "sten": 3 },
+      { "scale": "WS1", "ageMin": 16, "ageMax": 18, "rawMin": 11, "rawMax": 20, "sten": 5 },
+      { "scale": "WS1", "ageMin": 16, "ageMax": 18, "rawMin": 21, "rawMax": 30, "sten": 8 },
+      { "scale": "WS2", "ageMin": 16, "ageMax": 18, "rawMin": 0, "rawMax": 15, "sten": 4 },
+      { "scale": "WS2", "ageMin": 16, "ageMax": 18, "rawMin": 16, "rawMax": 30, "sten": 7 }
+    ],
+    "personalitySets": [
+      { "id": "P1", "types": ["ENFP", "ENFJ"] },
+      { "id": "P2", "types": ["INTJ", "ENTP"] }
+    ],
+    "careers": [
+      {
+        "code": "C001",
+        "name": "Software Engineer",
+        "category": "Engineering",
+        "eligibility": ["WS1 >= 6", "AGE >= 15"],
+        "fit": {
+          "aptitude": "WS1 + WS2",
+          "interest": "I001",
+          "personality": "IF(TYPE = 'ENFP', 5, 2)"
+        },
+        "corrections": [{ "when": "GENDER = 'M'", "delta": 1 }]
+      },
+      {
+        "code": "C002",
+        "name": "Civil Engineer",
+        "category": "Engineering",
+        "eligibility": ["WS1 >= 9"],
+        "fit": { "aptitude": "WS1" }
+      },
+      {
+        "code": "C003",
+        "name": "Data Analyst",
+        "category": "Engineering",
+        "eligibility": ["WS2 >= 4"],
+        "fit": { "aptitude": "WS2 * 2", "interest": "I001" }
+      }
+    ],
+    "rules": [
+      { "id": "R1", "when": "WS1 >= 8 AND P > J", "result": { "tag": "STEM" } },
+      { "id": "R2", "when": "GENDER = 'F'", "result": { "tag": "X" } }
+    ]
+  },
+  "input": {
+    "aptitude": [
+      { "scale": "WS1", "raw": 23 },
+      { "scale": "WS2", "raw": 12 }
+    ],
+    "interests": [
+      { "scale": "I001", "responses": [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0] }
+    ],
+    "mbti": { "E": 12, "I": 8, "S": 9, "N": 11, "T": 10, "F": 10, "J": 7, "P": 13 }
+  },
+  "expected": {
+    "aptitude": [
+      { "scale": "WS1", "sten": 8, "classification": "H" },
+      { "scale": "WS2", "sten": 4, "classification": "M" }
+    ],
+    "interests": [{ "scale": "I001", "score": 7.3333333, "classification": "H" }],
+    "mbtiType": "ENFP",
+    "personalitySet": "P1",
+    "csr": {
+      "Engineering": [
+        { "code": "C001", "rank": 1, "correctedTotal": 25.3333333 },
+        { "code": "C003", "rank": 2, "correctedTotal": 15.3333333 }
+      ]
+    },
+    "ineligibleCareers": ["C002"],
+    "ruleMatches": ["R1"]
+  }
+}

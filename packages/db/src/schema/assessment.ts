@@ -73,6 +73,33 @@ export const attempts = assessment.table(
   (t) => [uniqueIndex('attempts_candidate_assessment_no_ux').on(t.candidateId, t.assessmentId, t.attemptNumber)],
 );
 
+export const moduleProgressStatus = assessment.enum('module_progress_status', [
+  'pending',
+  'in_progress',
+  'submitted',
+  'expired',
+]);
+
+/** Per-attempt module state backing BR-13 sequencing; one row per attempt x module. */
+export const attemptModules = assessment.table(
+  'attempt_modules',
+  {
+    id: pk(),
+    attemptId: uuid('attempt_id')
+      .notNull()
+      .references(() => attempts.id, { onDelete: 'cascade' }),
+    moduleId: uuid('module_id')
+      .notNull()
+      .references(() => assessmentModules.id),
+    sequence: integer('sequence').notNull(),
+    status: moduleProgressStatus('status').notNull().default('pending'),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex('attempt_modules_attempt_module_ux').on(t.attemptId, t.moduleId)],
+);
+
 export const responses = assessment.table(
   'responses',
   {

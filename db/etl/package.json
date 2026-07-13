@@ -1,0 +1,12 @@
+{
+  "name": "@bodhi/etl",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ETL framework for the M1-M5 data migration: batched extract/transform/load jobs with legacy-ID mapping, run logging, and a reconciliation reporter. Concrete jobs land per entity once the D-02 schema inventory confirms source shapes.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

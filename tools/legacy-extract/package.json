@@ -1,0 +1,17 @@
+{
+  "name": "@bodhi/legacy-extract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "D-02/D-03/D-04 extraction CLI. Run against the legacy SQL Server Dev instance to dump the schema inventory, stored-procedure bodies, and scoring reference data. Output lands under db/legacy/ (git-ignored where sensitive).",
+  "main": "src/cli.ts",
+  "dependencies": {
+    "mssql": "^11.0.1"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/mssql": "^12.3.0"
+  }
+}

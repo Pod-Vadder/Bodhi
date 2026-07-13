@@ -3,8 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Bodhi API service. NestJS modules (auth, test-engine, commerce, counseling, reporting, ...) land here in P1+; this package currently reserves the workspace slot and wiring.",
+  "description": "Bodhi API service: NestJS wiring over framework-free domain modules (auth, test engine). Persistence adapters: in-memory (default until P1 DB wiring) and Drizzle/Postgres.",
   "main": "src/main.ts",
+  "dependencies": {
+    "@bodhi/db": "*",
+    "@bodhi/shared-config": "*",
+    "@bodhi/shared-types": "*",
+    "@bodhi/shared-validators": "*",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7"
+  },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"
   }

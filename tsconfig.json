@@ -4,6 +4,8 @@
     "packages/**/*.ts",
     "services/**/*.ts",
     "apps/**/*.ts",
+    "db/**/*.ts",
+    "tools/**/*.ts",
     "vitest.config.ts"
   ],
   "exclude": [

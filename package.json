@@ -7,7 +7,9 @@
   "workspaces": [
     "apps/*",
     "services/*",
-    "packages/*"
+    "packages/*",
+    "db/*",
+    "tools/*"
   ],
   "engines": {
     "node": ">=22"
@@ -20,7 +22,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "gm": "tsx packages/golden-master/src/cli.ts",
-    "db:generate": "drizzle-kit generate --config packages/db/drizzle.config.ts"
+    "db:generate": "drizzle-kit generate --config packages/db/drizzle.config.ts",
+    "api:dev": "tsx services/bodhi-api/src/main.ts",
+    "etl": "tsx db/etl/src/cli.ts",
+    "legacy:extract": "tsx tools/legacy-extract/src/cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

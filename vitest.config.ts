@@ -15,7 +15,12 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['packages/**/test/**/*.test.ts'],
+    include: [
+      'packages/**/test/**/*.test.ts',
+      'services/**/test/**/*.test.ts',
+      'db/**/test/**/*.test.ts',
+      'tools/**/test/**/*.test.ts',
+    ],
     coverage: {
       provider: 'v8',
       include: ['packages/scoring-engine/src/**'],

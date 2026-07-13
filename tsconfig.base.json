@@ -13,6 +13,8 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {

@@ -11,7 +11,7 @@ Target-stack rebuild of the Bodhi career-assessment platform (legacy ASP.NET Web
 | `packages/db` | `@bodhi/db` — Drizzle schema v1: `core`, `candidate`, `question_bank`, `assessment`, `commerce`, `counseling`, `billing`, `files`, `audit`, `migration` Postgres schemas; UUID v7 PKs; `legacy_id` traceability everywhere | **Built** |
 | `packages/shared-config` | Validated env contract (timer policy, payment gateway, JWT TTLs, attempt limit) | **Built** |
 | `packages/shared-types` / `packages/shared-validators` | Cross-cutting domain types and zod request schemas | **Built** |
-| `services/bodhi-api` | NestJS API — **auth** (JWT 15m/7d + rotation, bcrypt, RBAC guards, audit sink) and **test-engine core** (server-authoritative timer with D-27 policies, BR-12 attempt lock, BR-13 module sequencing, seeded question randomization, autosave) over framework-free domain services with in-memory adapters; Drizzle/Redis adapters land with P1 DB wiring | **Built, unit-tested, boots** |
+| `services/bodhi-api` | NestJS API — **auth** (JWT 15m/7d + rotation, bcrypt, RBAC guards, audit sink) and **test-engine core** (server-authoritative timer with D-27 policies, BR-12 attempt lock, BR-13 module sequencing, seeded question randomization, autosave) over framework-free domain services. `PERSISTENCE=postgres` wires the Drizzle/Postgres adapters + Redis timer store (integration-tested); `PERSISTENCE=memory` (default) runs DB-less | **Built, unit + integration tested, boots on both persistence modes** |
 | `tools/legacy-extract` | D-02/D-03/D-04 extraction CLI (schema inventory, SP dump with FLFS-priority flags, reference-data export) — run against the legacy Dev SQL Server | **Built** (needs Dev DB access to run) |
 | `db/etl` | M1–M5 ETL framework: batched runner with idempotent legacy-ID mapping, run log, reconciliation reporter | **Built, unit-tested** (per-entity jobs land after D-02) |
 | `apps/bodhi-web` | Next.js portals | P2 placeholder |
@@ -27,6 +27,8 @@ npm run coverage            # with the ≥90% scoring-engine gate
 npm run gm                  # golden-master run over synthetic fixtures
 npm run db:generate         # emit SQL migrations from the Drizzle schema
 npm run api:dev             # boot the API (in-memory persistence, port 3001)
+npm run test:integration    # integration tests — needs live postgres+redis (docker compose up -d)
+                            # PERSISTENCE=postgres npm run api:dev  → run against real Postgres/Redis
 npm run etl                 # ETL job registry (jobs land after D-02)
 npm run legacy:extract -- all   # run against the legacy Dev DB (needs LEGACY_SQLSERVER_* env)
 ```

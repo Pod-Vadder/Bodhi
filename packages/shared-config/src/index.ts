@@ -6,6 +6,9 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().url().default('postgres://bodhi:bodhi@localhost:5432/bodhi'),
   REDIS_URL: z.string().url().default('redis://localhost:6379'),
 
+  /** postgres = Drizzle/Postgres + Redis adapters; memory = DB-less dev/test mode. */
+  PERSISTENCE: z.enum(['memory', 'postgres']).default('memory'),
+
   S3_ENDPOINT: z.string().url().default('http://localhost:9000'),
   S3_ACCESS_KEY: z.string().default('minio'),
   S3_SECRET_KEY: z.string().default('minio12345'),

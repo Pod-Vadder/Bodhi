@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import type { Env } from '@bodhi/shared-config';
+import type { Db } from '@bodhi/db';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { BcryptHasher } from './password';
@@ -7,9 +8,15 @@ import { TokenService } from './tokens';
 import { InMemoryAuditSink, InMemoryRefreshTokenStore, InMemoryUserRepo } from './memory-adapters';
 import { SYSTEM_CLOCK, type AuditSink, type Clock, type RefreshTokenStore, type UserRepo } from './ports';
 import {
+  DrizzleAuditSink,
+  DrizzleRefreshTokenStore,
+  DrizzleUserRepo,
+} from '../persistence/drizzle-auth';
+import {
   AUDIT_SINK,
   AUTH_SERVICE,
   CLOCK,
+  DB,
   ENV,
   REFRESH_TOKEN_STORE,
   TOKEN_SERVICE,
@@ -17,16 +24,25 @@ import {
 } from '../di-tokens';
 import { JwtAuthGuard, RolesGuard } from './guards';
 
-/**
- * Persistence defaults to in-memory adapters until the P1 database wiring
- * lands (PERSISTENCE=postgres will switch to Drizzle adapters over @bodhi/db).
- */
 @Module({
   controllers: [AuthController],
   providers: [
-    { provide: USER_REPO, useFactory: () => new InMemoryUserRepo() },
-    { provide: REFRESH_TOKEN_STORE, useFactory: () => new InMemoryRefreshTokenStore() },
-    { provide: AUDIT_SINK, useFactory: () => new InMemoryAuditSink() },
+    {
+      provide: USER_REPO,
+      inject: [DB],
+      useFactory: (db: Db | null) => (db ? new DrizzleUserRepo(db) : new InMemoryUserRepo()),
+    },
+    {
+      provide: REFRESH_TOKEN_STORE,
+      inject: [DB],
+      useFactory: (db: Db | null) =>
+        db ? new DrizzleRefreshTokenStore(db) : new InMemoryRefreshTokenStore(),
+    },
+    {
+      provide: AUDIT_SINK,
+      inject: [DB],
+      useFactory: (db: Db | null) => (db ? new DrizzleAuditSink(db) : new InMemoryAuditSink()),
+    },
     { provide: CLOCK, useValue: SYSTEM_CLOCK },
     {
       provide: TOKEN_SERVICE,

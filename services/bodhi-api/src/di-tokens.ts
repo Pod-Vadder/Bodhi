@@ -4,6 +4,8 @@
  * token instead of relying on reflected parameter types.
  */
 export const ENV = 'ENV';
+export const DB = 'DB';
+export const REDIS = 'REDIS';
 export const AUTH_SERVICE = 'AUTH_SERVICE';
 export const TOKEN_SERVICE = 'TOKEN_SERVICE';
 export const USER_REPO = 'USER_REPO';

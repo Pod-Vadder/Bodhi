@@ -4,6 +4,7 @@ import { createDb, type Db } from '@bodhi/db';
 import Redis from 'ioredis';
 import { AuthModule } from './auth/auth.module';
 import { TestEngineModule } from './test-engine/test-engine.module';
+import { DevUiController } from './dev/dev-ui.controller';
 import { DB, ENV, REDIS } from './di-tokens';
 
 /**
@@ -34,5 +35,6 @@ export class EnvModule {}
 
 @Module({
   imports: [EnvModule, AuthModule, TestEngineModule],
+  controllers: [DevUiController],
 })
 export class AppModule {}

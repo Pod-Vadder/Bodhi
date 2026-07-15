@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bodhi — Dev Test Player</title>
+<style>
+  :root { --bg:#0f1420; --card:#1a2233; --line:#2a3550; --text:#e8ecf4; --muted:#93a0b8; --accent:#4f8cff; --ok:#2fbf71; --warn:#e0a83c; --err:#e05c5c; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; justify-content:center; padding:40px 16px; }
+  main { width:100%; max-width:640px; }
+  h1 { font-size:20px; margin-bottom:2px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--text); font-size:15px; }
+  button { margin-top:16px; padding:10px 18px; border-radius:8px; border:0; background:var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+  button.secondary { background:transparent; border:1px solid var(--line); color:var(--text); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .timer { font-variant-numeric:tabular-nums; font-size:22px; font-weight:700; }
+  .timer.low { color:var(--err); }
+  .badge { font-size:12px; color:var(--muted); }
+  .q { border-top:1px solid var(--line); padding:14px 0; }
+  .q p { margin-bottom:8px; }
+  .opt { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:6px; cursor:pointer; }
+  .opt:hover { background:rgba(79,140,255,.08); }
+  .status { font-size:12px; color:var(--muted); min-height:16px; margin-top:6px; }
+  .error { color:var(--err); font-size:13px; margin-top:10px; min-height:18px; }
+  .done { text-align:center; padding:40px 20px; }
+  .done h2 { color:var(--ok); margin-bottom:8px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bodhi — Dev Test Player</h1>
+  <div class="sub">Development harness for the test-engine API. Not the production portal.</div>
+
+  <div id="login" class="card">
+    <h2 style="font-size:16px">Candidate login</h2>
+    <label>Email</label><input id="email" value="demo.candidate@bodhi.local" />
+    <label>Password</label><input id="password" type="password" value="demo-pass-123" />
+    <button id="loginBtn">Log in</button>
+    <div id="loginErr" class="error"></div>
+  </div>
+
+  <div id="setup" class="card hidden">
+    <h2 style="font-size:16px">Start assessment</h2>
+    <div id="setupInfo" class="sub" style="margin:8px 0 0"></div>
+    <button id="startBtn">Start attempt</button>
+    <div id="setupErr" class="error"></div>
+  </div>
+
+  <div id="player" class="hidden">
+    <div class="card row">
+      <div><div id="moduleTitle" style="font-weight:600"></div><div id="moduleBadge" class="badge"></div></div>
+      <div id="timer" class="timer">--:--</div>
+    </div>
+    <div class="card">
+      <div id="questions"></div>
+      <div class="row">
+        <div id="saveStatus" class="status"></div>
+        <button id="submitBtn">Submit module</button>
+      </div>
+      <div id="playerErr" class="error"></div>
+    </div>
+  </div>
+
+  <div id="finished" class="card done hidden">
+    <h2>Assessment submitted ✓</h2>
+    <p class="sub">All modules completed. Scoring lands in the next build phase.</p>
+    <button id="againBtn" class="secondary">Back to start</button>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const show = (id) => ['login','setup','player','finished'].forEach((s) => $(s).classList.toggle('hidden', s !== id));
+  const state = { token:null, context:null, attemptId:null, timeLeftMs:0, tick:null, sync:null };
+
+  async function api(path, opts = {}) {
+    const res = await fetch(path, {
+      ...opts,
+      headers: { 'content-type':'application/json', ...(state.token ? { authorization:'Bearer ' + state.token } : {}), ...(opts.headers || {}) },
+    });
+    if (res.status === 204) return null;
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(body.message || res.statusText), { status: res.status, code: body.code });
+    return body;
+  }
+
+  $('loginBtn').onclick = async () => {
+    $('loginErr').textContent = '';
+    try {
+      const out = await api('/auth/login', { method:'POST', body: JSON.stringify({ email: $('email').value, password: $('password').value }) });
+      state.token = out.accessToken;
+      state.context = await api('/dev/context');
+      if (!state.context.candidateId || state.context.assessments.length === 0) {
+        $('loginErr').textContent = 'No candidate/assessment seeded — run: npx tsx services/bodhi-api/scripts/seed-demo.ts';
+        return;
+      }
+      $('setupInfo').textContent = `${out.user.email} → ${state.context.assessments[0].name}`;
+      show('setup');
+    } catch (e) { $('loginErr').textContent = e.message; }
+  };
+
+  $('startBtn').onclick = async () => {
+    $('setupErr').textContent = '';
+    try {
+      const attempt = await api('/attempts', { method:'POST', body: JSON.stringify({ candidateId: state.context.candidateId, assessmentId: state.context.assessments[0].id }) });
+      state.attemptId = attempt.id;
+      await loadModule();
+      show('player');
+    } catch (e) {
+      $('setupErr').textContent = e.status === 423 ? 'Attempt limit reached — this assessment is locked (BR-12).' : e.message;
+    }
+  };
+
+  async function loadModule() {
+    const mod = await api(`/attempts/${state.attemptId}/current-module`);
+    const questions = await api(`/attempts/${state.attemptId}/questions`);
+    $('moduleTitle').textContent = `Module ${mod.sequence}`;
+    $('moduleBadge').textContent = `${questions.length} questions · ${Math.round(mod.durationSeconds / 60)} min · server-timed`;
+    $('questions').innerHTML = questions.map((q, i) => `
+      <div class="q"><p>${i + 1}. ${q.text}</p>
+        ${q.options.map((o) => `<label class="opt"><input type="radio" name="${q.id}" value="${o.id}" /> ${o.label}</label>`).join('')}
+      </div>`).join('');
+    $('questions').querySelectorAll('input[type=radio]').forEach((el) => {
+      el.onchange = async () => {
+        $('saveStatus').textContent = 'saving…';
+        try {
+          await api(`/attempts/${state.attemptId}/answers`, { method:'PUT', body: JSON.stringify({ questionId: el.name, optionId: el.value, clientTimestamp: new Date().toISOString() }) });
+          $('saveStatus').textContent = 'saved ✓';
+        } catch (e) { $('saveStatus').textContent = ''; $('playerErr').textContent = e.message; }
+      };
+    });
+    startTimer(mod.timeLeftMs);
+  }
+
+  function startTimer(ms) {
+    state.timeLeftMs = ms;
+    clearInterval(state.tick); clearInterval(state.sync);
+    const render = () => {
+      const s = Math.max(0, Math.floor(state.timeLeftMs / 1000));
+      $('timer').textContent = `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+      $('timer').classList.toggle('low', s <= 30);
+    };
+    render();
+    state.tick = setInterval(() => { state.timeLeftMs -= 1000; render(); }, 1000);
+    state.sync = setInterval(async () => {
+      try { state.timeLeftMs = (await api(`/attempts/${state.attemptId}/timer`)).timeLeftMs; } catch { /* keep local */ }
+    }, 10000);
+  }
+
+  $('submitBtn').onclick = async () => {
+    $('playerErr').textContent = '';
+    try {
+      const out = await api(`/attempts/${state.attemptId}/submit-module`, { method:'POST' });
+      if (out.finished) { clearInterval(state.tick); clearInterval(state.sync); show('finished'); }
+      else await loadModule();
+    } catch (e) { $('playerErr').textContent = e.message; }
+  };
+
+  $('againBtn').onclick = () => show('setup');
+})();
+</script>
+</body>
+</html>

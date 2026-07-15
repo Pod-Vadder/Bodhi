@@ -8,3 +8,4 @@ coverage/
 .DS_Store
 db/seed/extracted/
 db/legacy/
+dump.rdb

@@ -16,6 +16,23 @@ Target-stack rebuild of the Bodhi career-assessment platform (legacy ASP.NET Web
 | `db/etl` | M1–M5 ETL framework: batched runner with idempotent legacy-ID mapping, run log, reconciliation reporter | **Built, unit-tested** (per-entity jobs land after D-02) |
 | `apps/bodhi-web` | Next.js portals | P2 placeholder |
 
+## See the app running (no database needed)
+
+```bash
+npm install
+npm run api:dev
+```
+
+Then open **http://localhost:3001/dev** — the dev test player, pre-seeded in memory with a demo candidate (`demo.candidate@bodhi.local` / `demo-pass-123`) and a two-module assessment. Login is prefilled; click through to see the server-authoritative timer, autosave, and BR-13 module sequencing. Nothing is persisted — restarting the server resets it.
+
+For the full stack against real Postgres/Redis:
+
+```bash
+docker compose up -d postgres redis
+npx tsx services/bodhi-api/scripts/seed-demo.ts
+PERSISTENCE=postgres npm run api:dev      # same UI at /dev, now persisted
+```
+
 ## Quickstart
 
 ```bash
